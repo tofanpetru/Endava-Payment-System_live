@@ -1,4 +1,4 @@
-@page "/transfer"
+﻿@page "/transfer"
 @using BlazorApp3.Shared
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
@@ -6,7 +6,7 @@
 @inject HttpClient HttpClient
 @inject NavigationManager navManager
 
-<h3>Transfer page</h3>
+<h3>Transfer</h3>
 
 @if (WalletList == null || WalletList.Count == 0)
 {
@@ -97,10 +97,7 @@ else
         try
         {
             var response = await HttpClient.PostAsJsonAsync($"api/wallet/transfer", transferData);
-            if (response.IsSuccessStatusCode)
-            {
-                navManager.NavigateTo("wallets");
-            }
+            navManager.NavigateTo($"wallets?{Constants.transferSuccess}={response.IsSuccessStatusCode}");
         }
         catch (AccessTokenNotAvailableException exception)
         {

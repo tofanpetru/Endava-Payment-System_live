@@ -1,39 +1,49 @@
 ﻿@page "/transfer/history"
 
-@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
-@using Microsoft.AspNetCore.Authorization;
-@using BlazorApp3.Shared;
 @inject HttpClient HttpClient
-@attribute [Authorize]
-    <style>
-        /* Pagination links */
-        .pagination a {
-            color: black;
-            float: left;
-            padding: 8px 16px;
-            text-decoration: none;
-            transition: background-color .3s;
-        }
-            /* Style the active/current link */
-            .pagination a.active {
-                background-color: dodgerblue;
-                color: white;
-            }
-            /* Add a grey background color on mouse-over */
-            .pagination a:hover:not(.active) {
-                background-color: #ddd;
-            }
-    </style>
 
-<h3>TransferHistory</h3>
+@attribute [Authorize]
+
+<style>
+    /* Pagination links */
+    .pagination a {
+        color: black;
+        float: left;
+        padding: 8px 16px;
+        text-decoration: none;
+        transition: background-color .3s;
+    }
+
+    /* Style the active/current link */
+    .pagination a.active {
+        background-color: dodgerblue;
+        color: white;
+    }
+
+    /* Add a grey background color on mouse-over */
+    .pagination a:hover:not(.active) {background-color: #ddd;}
+</style>
+
+<h3>Transfer History</h3>
+<td>
+    <button class="btn @(direction == Direction.Inbound ? "btn-secondary" : " btn-outline-secondary")"
+            @onclick="() => ChangeDirection(Direction.Inbound)">
+        Inbound
+    </button>
+</td>
+<td>
+    <button class="btn @(direction == Direction.Outbound ? "btn-secondary" : " btn-outline-secondary")"
+            @onclick="() => ChangeDirection(Direction.Outbound)">
+        Outbound
+    </button>
+</td>
 
 @if (transactionsData?.Transactions == null)
 {
-    <p>Loading...</p> 
+    <div>Loading...</div>
 }
 else
-{
-    <table class="table table-striped">
+{    <table class="table table-striped">
         <thead>
             <tr>
                 <td><strong>Id transaction</strong></td>
@@ -68,17 +78,7 @@ else
     </div>
 }
 
-<div>
-    <button class="btn @(direction == Direction.Inbound ? "btn-secondary" : " btn-outline-seciundary")" @onclick="() => ChangeDirection(Direction.Inbound)">
-        Inbound
-    </button>
-    <button class="btn @(direction == Direction.Outbound ? "btn-secondary" : " btn-outline-seciundary")" @onclick="() => ChangeDirection(Direction.Outbound)">
-        Outbound
-    </button>
-</div>
-
-@code 
-{
+@code {
 
     private TransactionsHistoryData transactionsData;
 

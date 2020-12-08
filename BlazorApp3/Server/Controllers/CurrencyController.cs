@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using BlazorApp3.Shared;
+﻿using BlazorApp3.Shared;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorApp3.Server.Controllers
@@ -22,4 +17,3 @@ namespace BlazorApp3.Server.Controllers
         }
     }
 }
-

@@ -14,7 +14,9 @@ using System.Linq;
 using BlazorApp3.Server.Data;
 using BlazorApp3.Server.Models;
 using System.Security.Claims;
-using RazorComponentsPreview;
+using MediatR;
+using BlazorApp3.Server.Middleware;
+using BlazorApp3.Server.Application.Promotion;
 
 namespace BlazorApp3.Server
 {
@@ -47,7 +49,11 @@ namespace BlazorApp3.Server
             services.Configure<IdentityOptions>(options =>
                 options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier);
 
-            //services.AddMediatR(typeof(Startup));
+            services.AddMediatR(typeof(Startup));
+
+            services.AddSingleton<IPromotionManager, PromotionManager>();
+
+            services.AddTransient<ExceptionHandlingMiddleware>();
 
             services.AddControllersWithViews();
             services.AddRazorPages();
@@ -78,6 +84,8 @@ namespace BlazorApp3.Server
             app.UseIdentityServer();
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {
