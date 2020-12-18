@@ -36,7 +36,7 @@ else
                 @wallet.Amount
                 @wallet.Currency
             </h5>
-            <button class="btn btn-success" @onclick="() => MakeTransfer()">Make transfer</button>
+            <button class="btn btn-success" @onclick="() => MakeTransfer(wallet.Id)">Make transfer</button>
             <button class="btn btn-danger" @onclick="() => DeleteWallet(wallet.Id)">Delete wallet</button>
             <br />
         </div>

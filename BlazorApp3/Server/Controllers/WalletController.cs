@@ -170,7 +170,7 @@ namespace BlazorApp3.Server.Controllers
                     transactions = query.OrderByDescending(x => x.Date)
                         .Skip((pageNumber - 1) * itemsPerPage).Take(itemsPerPage).ToArray();
                     break;
-                case Direction.None:
+                case Direction.DefaultDirection:
                 default:
                     query = context.Transactions.Where(t =>
                         walletIds.Contains(t.DestinationWalletId) || walletIds.Contains(t.SourceWalletId));

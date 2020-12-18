@@ -1,7 +1,15 @@
 ﻿@page "/"
 
-<h1>Hello, world!</h1>
+<h1>Salutare !</h1>
 
-Welcome to your new app.
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+<AuthorizeView>
+    <Authorized>
+        Bun venit la Fast Pay
+    </Authorized>
+
+    <NotAuthorized>
+        Pentru a avea acces la content, va rugam sa va logaţi
+    </NotAuthorized>
+</AuthorizeView>
+
