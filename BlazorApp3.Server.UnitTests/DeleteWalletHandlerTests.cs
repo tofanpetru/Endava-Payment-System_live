@@ -7,17 +7,21 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using NUnit.Framework;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using MediatR;
+using BlazorApp3.Server.Helpers;
+using BlazorApp3.Server.Data;
 
 namespace BlazorApp3.Server.UnitTests
 {
-    public class CreateWalletCommandHandlerTests
+    public class DeletWalletCommandHandlerTests
     {
         private ApplicationDbContext context;
-        private Mock<IPromotionManager> promotionManagerMock;
+        public Guid wallet_id = Guid.NewGuid();
 
         [SetUp]
         public void Setup()
@@ -37,8 +41,9 @@ namespace BlazorApp3.Server.UnitTests
                 {
                     new Wallet
                     {
+                        Id = wallet_id,
                         Amount = 100,
-                        Currency = "USD"
+                        Currency = "EUR"
                     }
                 }
             };
@@ -46,21 +51,17 @@ namespace BlazorApp3.Server.UnitTests
             context.Add(user);
 
             context.SaveChanges();
-
-            promotionManagerMock = new Mock<IPromotionManager>();
-
-            promotionManagerMock.Setup(x => x.GetDefaultAmount(It.IsAny<string>())).Returns(500);
         }
 
-        [Test]
-        public async Task CreateWalletSuccessful()
+        [Test] 
+        public async Task DeleteWalletExistentId()
         {
-            var sut = new CreateWalletCommandHandler(context, promotionManagerMock.Object);
+            var sut = new DeletWalletCommandHandler(context);
 
-            var command = new CreateWalletCommand
+            var command = new DeletWalletCommand
             {
                 UserId = "test_user_id",
-                Currency = "EUR"
+                WalletId = wallet_id
             };
 
             var result = await sut.Handle(command, CancellationToken.None);
@@ -68,44 +69,21 @@ namespace BlazorApp3.Server.UnitTests
             Assert.IsTrue(result.IsSuccessful);
         }
 
-        [Test]
-        public async Task CreateWalletInvalidCurrency()
-        {
-            var sut = new CreateWalletCommandHandler(context, promotionManagerMock.Object);
 
-            var command = new CreateWalletCommand
+        [Test] 
+        public async Task DeleteWalletNonExistentId()
+        {
+            var sut = new DeletWalletCommandHandler(context);
+
+            var command = new DeletWalletCommand
             {
                 UserId = "test_user_id",
-                Currency = "RUB"
+                WalletId = Guid()
             };
 
             var result = await sut.Handle(command, CancellationToken.None);
 
-            Assert.Multiple(() =>
-            {
-                Assert.IsFalse(result.IsSuccessful);
-                Assert.AreEqual("INVALID_CURRENCY", result.FailureReason);
-            });
-        }
-
-        [Test]
-        public async Task CreateWalletTestAmount()
-        {
-            var sut = new CreateWalletCommandHandler(context, promotionManagerMock.Object);
-
-            var command = new CreateWalletCommand
-            {
-                UserId = "test_user_id",
-                Currency = "EUR"
-            };
-
-            var result = await sut.Handle(command, CancellationToken.None);
-
-            Assert.Multiple(() =>
-            {
-                Assert.IsTrue(result.IsSuccessful);
-                Assert.AreEqual(500, result.Amount);
-            });
+            Assert.IsFalse(result.IsSuccessful);
         }
     }
 }

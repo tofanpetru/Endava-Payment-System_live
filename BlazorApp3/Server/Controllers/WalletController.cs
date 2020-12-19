@@ -74,19 +74,17 @@ namespace BlazorApp3.Server.Controllers
 
         [HttpDelete]
         [Route("{id}")]
-        public IActionResult DeleteWallet([FromRoute] Guid id)
+        public async Task<IActionResult> DeleteWallet([FromQuery] Guid walletId)
         {
-            var userId = userManager.GetUserId(User);
-            var user = context.Users.Include(x => x.Wallets).FirstOrDefault(x => x.Id == userId);
-
-            if (!user.Wallets.Any(x => x.Id == id))
+            var command = new DeleteWalletCommand
             {
-                return BadRequest();
-            }
+                UserId = userManager.GetUserId(User),
+                WalletId = walletId
+            };
 
-            var wallet = context.Wallets.Find(id);
-            context.Wallets.Remove(wallet);
-            context.SaveChanges();
+            var commandResult = await mediator.Send(command);
+            if (!commandResult.IsSuccessful)
+                return BadRequest();
 
             return Ok();
         }
