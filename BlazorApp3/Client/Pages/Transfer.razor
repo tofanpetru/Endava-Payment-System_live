@@ -48,60 +48,58 @@ else
 }
 
 
-@code {
-    [Parameter]
-    public string SourceWalletId { get; set; }
+@code { [Parameter]
+            public string SourceWalletId { get; set; }
 
-    private List<Wallet> WalletList { get; set; }
+            private List<Wallet> WalletList { get; set; }
 
-    public TransferDto transferData { get; set; } = new TransferDto();
+            public TransferDto transferData { get; set; } = new TransferDto();
 
-    private string RecipientInputClass { get; set; }
+            private string RecipientInputClass { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            WalletList = await HttpClient.GetFromJsonAsync<List<Wallet>>($"api/wallet");
-            transferData.Currency = WalletList.FirstOrDefault()?.Currency;
-        }
-        catch (AccessTokenNotAvailableException exception)
-        {
-            exception.Redirect();
-        }
-    }
-
-    private async Task ValidateUser()
-    {
-        try
-        {
-            var result = await HttpClient.GetFromJsonAsync<UserValidationResult>($"api/user/{transferData.Username}/validate");
-
-            if (result.Exists)
+            protected override async Task OnInitializedAsync()
             {
-                RecipientInputClass = "color: green;";
+                try
+                {
+                    WalletList = await HttpClient.GetFromJsonAsync<List<Wallet>>($"api/wallet");
+                    transferData.Currency = WalletList.FirstOrDefault()?.Currency;
+                }
+                catch (AccessTokenNotAvailableException exception)
+                {
+                    exception.Redirect();
+                }
             }
-            else
-            {
-                RecipientInputClass = "color: red;";
-            }
-        }
-        catch (AccessTokenNotAvailableException exception)
-        {
-            exception.Redirect();
-        }
-    }
 
-    private async Task MakeTransfer()
-    {
-        try
-        {
-            var response = await HttpClient.PostAsJsonAsync($"api/wallet/transfer", transferData);
-            navManager.NavigateTo($"wallets?{Constants.transferSuccess}={response.IsSuccessStatusCode}");
-        }
-        catch (AccessTokenNotAvailableException exception)
-        {
-            exception.Redirect();
-        }
-    }
-}
+            private async Task ValidateUser()
+            {
+                try
+                {
+                    var result = await HttpClient.GetFromJsonAsync<UserValidationResult>($"api/user/{transferData.Username}/validate");
+
+                    if (result.Exists)
+                    {
+                        RecipientInputClass = "color: green;";
+                    }
+                    else
+                    {
+                        RecipientInputClass = "color: red;";
+                    }
+                }
+                catch (AccessTokenNotAvailableException exception)
+                {
+                    exception.Redirect();
+                }
+            }
+
+            private async Task MakeTransfer()
+            {
+                try
+                {
+                    var response = await HttpClient.PostAsJsonAsync($"api/wallet/transfer", transferData);
+                    navManager.NavigateTo($"wallets?{Constants.transferSuccess}={response.IsSuccessStatusCode}");
+                }
+                catch (AccessTokenNotAvailableException exception)
+                {
+                    exception.Redirect();
+                }
+            } }

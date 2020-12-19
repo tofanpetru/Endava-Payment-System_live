@@ -18,93 +18,18 @@ using Wallet = BlazorApp3.Server.Models.Wallet;
 
 namespace BlazorApp3.Server.Controllers
 {
-    [Authorize]
-    [Route("api/[controller]")]
-    [ApiController]
-    public class WalletController : ControllerBase
+    public class TransferController : Controller
     {
         private readonly ApplicationDbContext context;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IMediator mediator;
 
-        public WalletController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IMediator mediator)
+        public TransferController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IMediator mediator)
         {
             this.context = context;
             this.userManager = userManager;
             this.mediator = mediator;
         }
-
-        [HttpGet]
-        public async Task<List<Wallet>> GetWallets()
-        {
-            var query = new GetWalletsQuery
-            {
-                UserId = userManager.GetUserId(User)
-            };
-            var wallets = await mediator.Send(query);
-            return wallets;
-        }
-
-        [HttpGet]
-        [Route("{id}")]
-        public Wallet GetWallet(Guid id)
-        {
-            var userId = userManager.GetUserId(User);
-            var wallet = context.Users.Include(x => x.Wallets).FirstOrDefault(x => x.Id == userId).Wallets.FirstOrDefault(x => x.Id == id);
-            return wallet;
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> CreateWallet([FromQuery] string currency)
-        {
-            var createWalletCommand = new CreateWalletCommand
-            {
-                UserId = userManager.GetUserId(User),
-                Currency = currency
-            };
-            var createWalletResult = await mediator.Send(createWalletCommand);
-
-            if (!createWalletResult.IsSuccessful)
-            {
-                return BadRequest();
-            }
-
-            return Ok();
-        }
-
-        [HttpDelete]
-        [Route("{id}")]
-        public IActionResult DeleteWallet([FromRoute] Guid id)
-        {
-            var userId = userManager.GetUserId(User);
-            var user = context.Users.Include(x => x.Wallets).FirstOrDefault(x => x.Id == userId);
-
-            if (!user.Wallets.Any(x => x.Id == id))
-            {
-                return BadRequest();
-            }
-
-            var wallet = context.Wallets.Find(id);
-            context.Wallets.Remove(wallet);
-            context.SaveChanges();
-
-            return Ok();
-        }
-        /*
-        public async Task<IActionResult> DeleteWallet([FromQuery] Guid walletId)
-        {
-            var command = new DeleteWalletCommand
-            {
-                UserId = userManager.GetUserId(User),
-                WalletId = walletId
-            };
-
-            var commandResult = await mediator.Send(command);
-            if (!commandResult.IsSuccessful)
-                return BadRequest();
-
-            return Ok();
-        }*/
 
         [HttpPost]
         [Route("transfer")]
@@ -126,7 +51,7 @@ namespace BlazorApp3.Server.Controllers
             }
 
             var destinationUser = context.Users.Include(x => x.Wallets).FirstOrDefault(x => x.UserName == data.Username);
-            if(destinationUser == null)
+            if (destinationUser == null)
             {
                 throw new NotFoundException();
             }
@@ -199,7 +124,7 @@ namespace BlazorApp3.Server.Controllers
                 Transactions = transactions.Select(DomainMapper.ToDto).ToArray(),
                 ItemCount = query.Count()
             };
-            
+
             return transactionsData;
         }
     }
