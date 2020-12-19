@@ -38,7 +38,7 @@
     </button>
 </td>
 
-@if (transactionsData?.Transactions == null)
+@if (transactionsData?.Transactions == null && WalletList == null)
 {
     <div>Loading...</div>
 }
@@ -48,6 +48,7 @@ else
             <tr>
                 <td><strong>Id transaction</strong></td>
                 <td><strong>Date</strong></td>
+                <td><strong>Status:</strong></td>
                 <td><strong>Amount</strong></td>
                 <td><strong>DestinationWalletId</strong></td>
                 <td><strong>SourceWalletId</strong></td>
@@ -59,6 +60,18 @@ else
                 <tr>
                     <td>@transaction.Id</td>
                     <td>@transaction.Date</td>
+                    @foreach (var wallet in WalletList)
+                    {
+                            @if (wallet.Id == transaction.SourceWalletId)
+                            {
+                                status = "Trimis";
+                            }
+                            else
+                            {
+                                status = "Primit";
+                            }
+                    }
+                    <td>@status</td>
                     <td>@transaction.Amount</td>
                     <td class="small">@Convert.ToString(transaction.DestinationWalletId).Substring(0, 6)@string.Concat(Enumerable.Repeat("**", 15))</td>
                     <td class="small">@Convert.ToString(transaction.SourceWalletId).Substring(0, 6)@string.Concat(Enumerable.Repeat("**", 15))</td>
@@ -86,10 +99,26 @@ else
     private int itemsPerPage = 5; //max 5 tranzactii pe pagina
 
     private Direction direction;
+    public string status;
+
+    private List<Wallet> WalletList;
 
     protected override async Task OnInitializedAsync()
     {
         await LoadTransactions(pageNumber);
+        await LoadWallets();
+    }
+
+    private async Task LoadWallets()
+    {
+        try
+        {
+            WalletList = await HttpClient.GetFromJsonAsync<List<Wallet>>("api/wallet");
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
     }
 
     private async Task LoadTransactions(int pNam)
