@@ -62,7 +62,7 @@ else
                     <td>@transaction.Date</td>
                     @foreach (var wallet in WalletList)
                     {
-                            @if (wallet.Id == transaction.SourceWalletId)
+                            @if (wallet.Id == transaction.SourceWalletId && wallet.Id != transaction.DestinationWalletId)
                             {
                                 status = "Trimis";
                             }
